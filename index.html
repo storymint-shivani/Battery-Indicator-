@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Battery indicator </title>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Battery Indicator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0a0a0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', monospace;
+      overflow: hidden;
+    }
+
+    /* Background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,165,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,165,0,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .card {
+      background: #111118;
+      border: 1px solid rgba(255,165,0,0.2);
+      border-radius: 20px;
+      padding: 48px 52px;
+      width: 380px;
+      box-shadow:
+        0 0 40px rgba(255,165,0,0.06),
+        inset 0 0 40px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 30px; right: 30px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,165,0,0.6), transparent);
+    }
+
+    h1 {
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      color: rgba(255,165,0,0.5);
+      text-transform: uppercase;
+      margin-bottom: 36px;
+      text-align: center;
+    }
+
+    /* Battery shell */
+    .battery-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+
+    .battery-shell {
+      flex: 1;
+      height: 44px;
+      border: 2px solid rgba(255,165,0,0.4);
+      border-radius: 8px;
+      padding: 5px;
+      position: relative;
+      background: rgba(0,0,0,0.4);
+    }
+
+    .battery-tip {
+      width: 8px;
+      height: 20px;
+      background: rgba(255,165,0,0.4);
+      border-radius: 0 4px 4px 0;
+      align-self: center;
+    }
+
+    .battery-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #02f81f, #04e72d);
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Shine sweep */
+    .battery-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shine 2.5s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      60%, 100% { left: 150%; }
+    }
+
+    /* Percentage display */
+    .percent-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 32px;
+    }
+
+    .percent-big {
+      font-size: 56px;
+      font-weight: 900;
+      color: #ffd700;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(255,215,0,0.4);
+      font-family: 'Orbitron', monospace;
+    }
+
+    .percent-big span {
+      font-size: 22px;
+      opacity: 0.6;
+    }
+
+    .status-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: rgba(255,165,0,0.5);
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4cff91;
+      margin-right: 6px;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* Tick marks */
+    .ticks {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2px;
+      margin-top: 8px;
+    }
+
+    .tick {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: rgba(255,165,0,0.3);
+    }
+
+    /* Slider */
+    .controls {
+      margin-top: 32px;
+      border-top: 1px solid rgba(255,165,0,0.1);
+      padding-top: 24px;
+    }
+
+    .controls label {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: rgba(255,165,0,0.35);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,165,0,0.15);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffd700;
+      box-shadow: 0 0 12px rgba(255,215,0,0.6);
+      border: 2px solid #0a0a0f;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Battery Indicator</h1>
+
+    <div class="percent-row">
+      <div class="percent-big" id="percentDisplay">70<span>%</span></div>
+      <div class="status-label">
+        <div><span class="status-dot"></span>CHARGING</div>
+        <div>ETA &nbsp;1h 24m</div>
+      </div>
+    </div>
+
+    <div class="battery-wrap">
+      <div class="battery-shell">
+        <div class="battery-fill" id="fill"></div>
+      </div>
+      <div class="battery-tip"></div>
+    </div>
+
+    <div class="ticks">
+      <span class="tick">0</span>
+      <span class="tick">25</span>
+      <span class="tick">50</span>
+      <span class="tick">75</span>
+      <span class="tick">100</span>
+    </div>
+
+    <div class="controls">
+      <label>ADJUST LEVEL</label>
+      <input type="range" min="0" max="100" value="70" id="slider" />
+    </div>
+  </div>
+
+  <script>
+    const fill = document.getElementById('fill');
+    const display = document.getElementById('percentDisplay');
+    const slider = document.getElementById('slider');
+
+    function setLevel(val) {
+      fill.style.width = val + '%';
+      display.innerHTML = val + '<span>%</span>';
+
+      // Color shifts by level
+      if (val <= 20) {
+        fill.style.background = 'linear-gradient(90deg, #ff2200, #ff6600)';
+        fill.style.boxShadow = '0 0 16px rgba(255,50,0,0.5)';
+      } else if (val <= 50) {
+        fill.style.background = 'linear-gradient(90deg, #ff8c00, #ffaa00)';
+        fill.style.boxShadow = '0 0 16px rgba(255,140,0,0.4)';
+      } else {
+        fill.style.background = 'linear-gradient(90deg, #ff8c00, #ffd700)';
+        fill.style.boxShadow = '0 0 16px rgba(255,215,0,0.4)';
+      }
+    }
+
+    // Animate in on load
+    window.addEventListener('load', () => {
+      setTimeout(() => setLevel(70), 200);
+    });
+
+    slider.addEventListener('input', (e) => setLevel(e.target.value));
+  </script>
+
+</body>
+</html>
+</body>
+</html>
